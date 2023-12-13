@@ -1,0 +1,64 @@
+name: Looker CI
+
+on: [push]
+
+env:
+  SPECTACLES_PARAMS: --base-url ${{vars.LOOKER_BASE_URL}} --client-id ${{vars.LOOKER_CLIENT_ID}} --client-secret ${{secrets.LOOKER_CLIENT_SECRET}} --project ${{vars.LOOKER_PROJECT}}
+
+jobs:
+  lams:
+    runs-on: ubuntu-latest
+    name: LAMS
+    steps:
+      - name: Checkout your LookML
+        uses: actions/checkout@v1
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      - name: Install LAMS
+        run: npm install -g @looker/look-at-me-sideways@3.0.0-beta.0
+      - name: Run LAMS
+        # See [PRIVACY.md](https://github.com/looker-open-source/look-at-me-sideways/blob/master/PRIVACY.md)
+        run: echo "View the rules here --> https://looker-open-source.github.io/look-at-me-sideways/rules.html" && lams --reporting=no --output=lines --date-output=none
+      - name: View LAMS Rules
+        if: success() || failure()
+        run: echo "View the rules here --> https://looker-open-source.github.io/look-at-me-sideways/rules.html"
+  spectacles_sql:
+    runs-on: ubuntu-latest
+    name: Spectacles SQL
+    steps:
+      - name: python dependencies
+        run: pip install spectacles==2.3.14
+      - name: Run Spectacles SQL
+        run: spectacles sql $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
+      - name: Print logs file structure
+        if: failure()
+        run: tree ..
+      - name: Print errored SQL statements
+        if: failure()
+        run: for file in "$(pwd)/logs/queries"/*; do printf "%s\n" "-----------$(basename $file)-----------"; cat $file; printf "\n\n";done
+  spectacles_lookml:
+    runs-on: ubuntu-latest
+    name: Spectacles LookML
+    steps:
+      - name: python dependencies
+        run: pip install spectacles==2.3.14
+      - name: Run Spectacles LookML
+        run: spectacles lookml $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
+  spectacles_content:
+    runs-on: ubuntu-latest
+    name: Spectacles Content
+    steps:
+      - name: python dependencies
+        run: pip install spectacles==2.3.14
+      - name: Run Spectacles Content
+        run: spectacles content $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
+  spectacles_assert:
+    runs-on: ubuntu-latest
+    name: Spectacles Assert
+    steps:
+      - name: python dependencies
+        run: pip install spectacles==2.3.14
+      - name: Run Spectacles Assert
+        run: spectacles assert $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
