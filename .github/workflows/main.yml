@@ -29,7 +29,7 @@ jobs:
     name: Spectacles SQL
     steps:
       - name: python dependencies
-        run: pip install spectacles==2.3.14
+        run: pip install spectacles==2.3.16
       - name: Run Spectacles SQL
         run: spectacles sql $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
       - name: Print logs file structure
@@ -43,7 +43,7 @@ jobs:
     name: Spectacles LookML
     steps:
       - name: python dependencies
-        run: pip install spectacles==2.3.14
+        run: pip install spectacles==2.3.16
       - name: Run Spectacles LookML
         run: spectacles lookml $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
   spectacles_content:
@@ -51,7 +51,7 @@ jobs:
     name: Spectacles Content
     steps:
       - name: python dependencies
-        run: pip install spectacles==2.3.14
+        run: pip install spectacles==2.3.16
       - name: Run Spectacles Content
         run: spectacles content $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
   spectacles_assert:
@@ -59,6 +59,6 @@ jobs:
     name: Spectacles Assert
     steps:
       - name: python dependencies
-        run: pip install spectacles==2.3.14
+        run: pip install spectacles==2.3.16
       - name: Run Spectacles Assert
         run: spectacles assert $SPECTACLES_PARAMS --branch ${GITHUB_REF##*/}
